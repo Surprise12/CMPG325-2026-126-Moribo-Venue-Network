@@ -1,0 +1,69 @@
+hostname L3-SW
+enable secret cisco
+service password-encryption
+ip routing
+vlan 10
+ name Management
+vlan 20
+ name Staff
+vlan 30
+ name POS
+vlan 40
+ name Guest
+vlan 99
+ name Native
+interface vlan 10
+ ip address 172.30.80.1 255.255.255.192
+ no shutdown
+interface vlan 20
+ ip address 172.30.80.65 255.255.255.192
+ no shutdown
+interface vlan 30
+ ip address 172.30.80.129 255.255.255.192
+ no shutdown
+interface vlan 40
+ ip address 172.30.80.193 255.255.255.224
+ no shutdown
+interface gigabitEthernet 0/1
+ switchport mode trunk
+ switchport trunk native vlan 99
+interface gigabitEthernet 0/2
+ switchport mode trunk
+ switchport trunk native vlan 99
+interface gigabitEthernet 0/3
+ switchport mode access
+ switchport access vlan 10
+ no shutdown
+interface fastEthernet 0/1
+ switchport mode access
+ switchport access vlan 10
+ no shutdown
+ip dhcp excluded-address 172.30.80.1 172.30.80.9
+ip dhcp excluded-address 172.30.80.65 172.30.80.69
+ip dhcp excluded-address 172.30.80.129 172.30.80.129
+ip dhcp excluded-address 172.30.80.193 172.30.80.194
+ip dhcp pool MGMT_POOL
+ network 172.30.80.0 255.255.255.192
+ default-router 172.30.80.1
+ip dhcp pool STAFF_POOL
+ network 172.30.80.64 255.255.255.192
+ default-router 172.30.80.65
+ dns-server 8.8.8.8
+ip dhcp pool POS_POOL
+ network 172.30.80.128 255.255.255.192
+ default-router 172.30.80.129
+ip dhcp pool GUEST_POOL
+ network 172.30.80.192 255.255.255.224
+ default-router 172.30.80.193
+ dns-server 8.8.8.8
+username admin secret admin123
+line vty 0 4
+ transport input ssh
+ login local
+ password cisco
+line console 0
+ password console
+ login
+ip ssh version 2
+ip domain-name moribo.local
+crypto key generate rsa modulus 1024
